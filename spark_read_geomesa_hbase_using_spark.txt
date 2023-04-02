@@ -4,18 +4,18 @@ import org.apache.spark.sql.execution.datasources
 
 val dsParams = Map(
 "hbase.zookeepers" -> "192.168.1.41",
-"hbase.catalog" -> "gss")
+"hbase.catalog" -> "<nameOfCatalog/schema>")
 // Create SparkSession
 val sparkSession = SparkSession.builder().appName("testSpark").config("spark.sql.crossJoin.enabled", "true").enableHiveSupport().master("spark://192.168.1.41:7077").getOrCreate()
 
 // Create DataFrame using the "geomesa" format
-val dataFrame = sparkSession.read.format("geomesa").options(dsParams).option("geomesa.feature", "faults_latest_v2").load()
-dataFrame.createOrReplaceTempView("faults_latest_v2")
-val sql = " desc faults_latest_v2"
+val dataFrame = sparkSession.read.format("geomesa").options(dsParams).option("geomesa.feature", "<nameOfFeature/table>").load()
+dataFrame.createOrReplaceTempView("<nameOfFeature/table>")
+val sql = " desc <nameOfFeature/table>"
 val result = sparkSession.sql(sql)
 //result.show(50, false)
 
-val sql = "select * from faults_latest_v2 limit 100000"
+val sql = "select * from <nameOfFeature/table> limit 100000"
 val result = sparkSession.sql(sql)
 result.show
 
@@ -37,24 +37,24 @@ import org.locationtech.geomesa.spark.jts._
 
 val params = Map(
 "hbase.zookeepers" -> "192.168.1.41",
-"hbase.catalog" -> "gss").asJava
+"hbase.catalog" -> "<nameOfCatalog/schema>").asJava
 
 
 spark.withJTS
 import spark.implicits._
 
 
-val faults = spark.read
+val tableRDD = spark.read
   .format("geomesa")
   .options(params)
-  .option("geomesa.feature", "faults_v2")
+  .option("geomesa.feature", "<nameOfFeature/table>")
   .load()
   
   
-faults.show
-faults.show(false)
-faults.filter(faults("row1) === "value1").show(false)
-faults.select("row1").show(false)
+tableRDD.show
+tableRDD.show(false)
+tableRDD.filter(tableRDD("row1) === "value1").show(false)
+tableRDD.select("row1").show(false)
 
 
 
